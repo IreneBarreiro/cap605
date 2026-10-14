@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>In Your Words · Resume Tailor</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header><a class="brand" href="./">In Your Words<span>RESUME STUDIO</span></a><span class="privacy">Private by default · works in your browser</span></header>
+<main>
+<section class="intro"><span class="eyebrow">YOUR EXPERIENCE. YOUR VOICE.</span><h1>A resume that speaks<br>to your next role.</h1><p>Bring your experience and a job description. Put your most relevant accomplishments first, without losing the words that make them yours.</p></section>
+<form id="form">
+<div class="inputs">
+<section class="card"><div class="card-heading"><h2><span>01</span> Your resume</h2><label class="upload" for="file">Import .txt</label><input id="file" type="file" accept=".txt,text/plain" hidden></div><p>Paste your resume, keeping a heading for each role and one bullet per line.</p><label class="sr-only" for="resume">Your resume</label><textarea id="resume" placeholder="YOUR NAME\nProduct Designer · New York\n\nEXPERIENCE\nDesigner — Company\n• Led research with customers to understand their needs.\n• Built prototypes and collaborated with engineers." required></textarea></section>
+<section class="card"><div class="card-heading"><h2><span>02</span> The opportunity</h2></div><p>Paste the job description, including responsibilities and desired skills.</p><label class="sr-only" for="job">Job description</label><textarea id="job" placeholder="We're looking for…\n\nResponsibilities\n• …\n\nSkills and qualifications\n• …" required></textarea></section>
+</div>
+<div class="action"><p>Uses your existing sentences to reorder bullets within each role.<br>No invented skills, credentials, or achievements. No AI rewriting.</p><button type="submit">Tailor my resume <span aria-hidden="true">↗</span></button></div>
+<p id="status" role="status" aria-live="polite"></p>
+</form>
+<section id="result" class="card result" hidden><div class="card-heading"><h2><span>03</span> Make it yours</h2><button id="download" class="secondary" type="button">Download .txt</button></div><p id="explanation"></p><label for="draft">Review and edit your draft before applying</label><textarea id="draft"></textarea><div class="insights"><div><h3>Shared language</h3><p id="matched"></p></div><div><h3>Terms to review</h3><p id="missing"></p><small>These terms appear in the job description but not your resume. Only add them if your experience supports them.</small></div></div></section>
+</main><footer>Your resume stays in this browser tab. Refreshing clears it. <span>Built around your story.</span></footer>
+<script type="module" src="app.js"></script>
+</body></html>
