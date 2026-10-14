@@ -2,15 +2,16 @@
 
 A browser-based resume tailoring app for Firebase project `project-demo-c7a0d`.
 
-Paste a resume and job description, or import a plain-text resume. The app prioritizes consecutive bullet points within each original role based on shared job-description terms, preserves the original wording, and lists missing terms for review. Edit the draft and download it as plain text.
+Paste a resume and job description, or import a PDF, Word (.docx), or plain-text resume. The app prioritizes consecutive bullet points within each original role based on shared job-description terms, preserves the original wording, and lists missing terms for review. Edit the draft and download it as plain text.
 
-This version uses keyword matching, not AI rewriting or semantic analysis. It does not invent experience or add missing skills. Resume and job-description contents remain in memory in the browser tab; there is no database, account, or external AI request. Refreshing clears the contents. It currently supports plain text rather than PDF or Word imports/exports.
+This version uses keyword matching, not AI rewriting or semantic analysis. It does not invent experience or add missing skills. Resume and job-description contents remain in memory in the browser tab; there is no database, account, or external AI request. Refreshing clears the contents. Imports are processed locally in your browser. Scanned PDFs require a text-based copy; password-protected PDFs require an unlocked copy. Older .doc files should be saved as .docx. Review extracted text, especially multi-column PDF layouts. Downloads remain plain text.
 
 ## Local development
 
-Requires Node.js 24 and Python 3. There are no app dependencies to install.
+Requires Node.js 24 and Python 3. Install the locked dependencies first. Document parsers are bundled and served from the app itself.
 
 ```sh
+npm ci
 npm test
 npm start
 ```

@@ -1,11 +1,24 @@
 import {tailor} from './tailor.js';
 const el = id => document.getElementById(id);
+let importing = false;
 el('file').addEventListener('change', async event => {
   const file = event.target.files[0];
-  if (!file) return;
-  if (file.size > 2_000_000 || !/\.txt$/i.test(file.name)) { el('status').textContent = 'Please import a .txt file smaller than 2 MB.'; return; }
-  try { el('resume').value = await file.text(); el('status').textContent = 'Resume imported.'; }
-  catch { el('status').textContent = 'Could not read that file. Please paste your resume instead.'; }
+  if (!file || importing) return;
+  importing = true;
+  el('file').disabled = true;
+  const submit = el('form').querySelector('button[type="submit"]');
+  submit.disabled = true;
+  el('status').textContent = 'Reading your resume…';
+  try {
+    const {importResume} = await import('./vendor/import.js');
+    const text = await importResume(file);
+    el('resume').value = text;
+    el('status').textContent = 'Resume imported. Review the extracted text and line breaks before tailoring.';
+  } catch (error) {
+    el('status').textContent = error.message?.includes('PDF') || error.message?.includes('Please') || error.message?.includes('file') || error.message?.includes('text') ? error.message : 'Could not read this file. Try saving it again as PDF or .docx, or paste your resume.';
+  } finally {
+    importing = false; el('file').disabled = false; submit.disabled = false; el('file').value = '';
+  }
 });
 el('form').addEventListener('submit', event => {
   event.preventDefault();
