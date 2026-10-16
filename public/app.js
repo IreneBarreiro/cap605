@@ -52,6 +52,19 @@ el('form').addEventListener('submit', async event => {
   } catch (error) { el('status').textContent = error.message; }
   finally { tailoring = false; submit.disabled = false; el('file').disabled = false; }
 });
+el('download-pdf').addEventListener('click', async () => {
+  const button = el('download-pdf');
+  button.disabled = true;
+  button.textContent = 'Preparing PDF…';
+  try {
+    const {downloadResumePdf} = await import('./vendor/pdf.js');
+    await downloadResumePdf(el('draft').value);
+    el('status').textContent = 'Your tailored PDF is ready.';
+    el('pdf-status').textContent = 'PDF prepared from your current draft.';
+  } catch (error) {
+    el('pdf-status').textContent = error.message?.includes('empty') ? error.message : 'Could not create the PDF. Please try again or download the text version.';
+  } finally { button.disabled = false; button.textContent = 'Download PDF'; }
+});
 el('download').addEventListener('click', () => {
   const url = URL.createObjectURL(new Blob([el('draft').value], {type: 'text/plain;charset=utf-8'}));
   const link = document.createElement('a'); link.href = url; link.download = 'tailored-resume.txt'; link.click();
