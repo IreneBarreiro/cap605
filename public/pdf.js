@@ -19,6 +19,6 @@ export function resumeDocument(text) {
     content
   };
 }
-export async function downloadResumePdf(text) {
-  await pdfMake.createPdf(resumeDocument(text)).download('tailored-resume.pdf');
+export async function createResumePdf(text) {
+  return pdfMake.createPdf(resumeDocument(text)).getBlob();
 }

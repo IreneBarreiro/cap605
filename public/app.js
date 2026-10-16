@@ -29,12 +29,38 @@ el('forget-resume').addEventListener('click', () => {
   try { forgetResume(window.localStorage); }
   catch { el('saved-status').textContent = 'Could not delete browser storage. Clear this site’s data in your browser settings.'; return; }
   el('resume').value = ''; el('voice').value = ''; el('use-voice').checked = false;
+  clearPreparedPdf();
   el('draft').value = ''; el('result').hidden = true;
   el('saved-status').textContent = 'Saved resume and writing sample deleted from this browser.';
   el('status').textContent = ''; updateSubmitLabel();
 });
 let importing = false;
 let tailoring = false;
+let pdfUrl;
+function clearPreparedPdf() {
+  if (pdfUrl) URL.revokeObjectURL(pdfUrl);
+  pdfUrl = undefined;
+  el('save-pdf').hidden = true;
+  el('save-pdf').removeAttribute('href');
+  el('pdf-help').hidden = true;
+}
+async function preparePdf(text) {
+  const {createResumePdf} = await import('./vendor/pdf.js');
+  const blob = await createResumePdf(text);
+  if (el('draft').value !== text) throw new Error('Your draft changed while the PDF was being prepared. Click Download PDF again to export your latest edits.');
+  clearPreparedPdf();
+  pdfUrl = URL.createObjectURL(blob);
+  el('save-pdf').href = pdfUrl;
+  el('save-pdf').hidden = false;
+  el('pdf-help').hidden = false;
+  // Keep a real link available for browsers that block automatic downloads.
+  el('save-pdf').click();
+}
+el('draft').addEventListener('input', () => {
+  clearPreparedPdf();
+  el('pdf-status').textContent = 'Draft edited. Click Download PDF to prepare the updated file.';
+});
+window.addEventListener('pagehide', clearPreparedPdf);
 el('file').addEventListener('change', async event => {
   const file = event.target.files[0];
   if (!file || importing) return;
@@ -75,6 +101,7 @@ el('form').addEventListener('submit', async event => {
       source = rewritten.text; summary = rewritten.summary;
     }
     const result = tailor(source, job);
+    clearPreparedPdf();
     el('draft').value = result.text;
     el('pdf-status').textContent = '';
     el('matched').textContent = result.matched.join(' · ') || 'No shared terms found. Review the description and your experience.';
@@ -87,10 +114,9 @@ el('form').addEventListener('submit', async event => {
     el('status').textContent = 'Your draft is ready to review.';
     el('result').scrollIntoView({behavior: 'smooth', block: 'start'});
     try {
-      const {downloadResumePdf} = await import('./vendor/pdf.js');
-      await downloadResumePdf(result.text);
+      await preparePdf(result.text);
       el('status').textContent = 'Your tailored PDF is ready. Your saved base resume is unchanged.';
-      el('pdf-status').textContent = 'PDF prepared. Review your draft below; edit and download again if needed.';
+      el('pdf-status').textContent = 'PDF prepared. If nothing downloaded, click Save PDF above.';
     } catch {
       el('pdf-status').textContent = 'Your tailored draft is ready, but the PDF could not download automatically. Use Download PDF to retry.';
     }
@@ -102,12 +128,11 @@ el('download-pdf').addEventListener('click', async () => {
   button.disabled = true;
   button.textContent = 'Preparing PDF…';
   try {
-    const {downloadResumePdf} = await import('./vendor/pdf.js');
-    await downloadResumePdf(el('draft').value);
+    await preparePdf(el('draft').value);
     el('status').textContent = 'Your tailored PDF is ready.';
-    el('pdf-status').textContent = 'PDF prepared from your current draft.';
+    el('pdf-status').textContent = 'PDF prepared from your current draft. If nothing downloaded, click Save PDF above.';
   } catch (error) {
-    el('pdf-status').textContent = error.message?.includes('empty') ? error.message : 'Could not create the PDF. Please try again or download the text version.';
+    el('pdf-status').textContent = error.message?.includes('empty') || error.message?.includes('draft changed') ? error.message : 'Could not create the PDF. Please try again or download the text version.';
   } finally { button.disabled = false; button.textContent = 'Download PDF'; }
 });
 el('download').addEventListener('click', () => {
